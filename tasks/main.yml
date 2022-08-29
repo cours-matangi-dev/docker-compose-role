@@ -1,0 +1,33 @@
+---
+# tasks file for docker_compose
+
+- name: create directory
+  file:
+    path: /tmp/app
+    state: directory
+
+- name: copy app to tmp
+  copy:
+    src: "."
+    dest: /tmp/app
+
+- name: test docker-compose
+  docker_compose:
+    project_src: /tmp/app
+    files: docker-compose-nginx.yml
+    state: present
+  register: __docker_compose_output
+
+- name: debug
+  debug: 
+    var: __docker_compose_output
+
+- name: definition de docker-compose.yml dans la task
+  docker_compose:
+    project_name: mynginx
+    definition:
+      version: "3.7"
+      services:
+        container_nginx_from_task:
+          container_name: container_nginx_from_task
+          image: nginx:latest
